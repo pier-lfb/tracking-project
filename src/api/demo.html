@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Vision Monitor Demo</title>
+  <style>
+    :root { --accent:#4cc8ff; --bg:#111; --panel:#1a1a1a; --line:#333; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color:#eee;
+           margin:0; padding:24px; }
+    h1 { font-size:20px; font-weight:600; margin:0 0 16px; }
+    .controls { margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap; }
+    input, select { background:#222; border:1px solid #444; color:#eee;
+            padding:9px; border-radius:6px; }
+    input { flex:1; min-width:240px; }
+    button { background:var(--accent); border:none; color:#000; font-weight:600;
+             padding:9px 18px; border-radius:6px; cursor:pointer; }
+    .layout { display:flex; gap:20px; align-items:stretch; }
+    .video-col { flex:3; }
+    #stream { width:100%; border:1px solid var(--line); border-radius:10px;
+              background:#000; display:block; }
+    .side { flex:1; display:flex; flex-direction:column; gap:20px; min-width:300px; }
+
+    .card { background:linear-gradient(180deg,#1d1d1f,#161617);
+            border:1px solid var(--line); border-radius:12px; padding:18px; }
+    .card h2 { font-size:12px; letter-spacing:.12em; color:#7fc7e8;
+               margin:0 0 14px; font-weight:700; text-transform:uppercase; }
+
+    .metrics { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .metric { background:#0e0e0f; border:1px solid #292929; border-radius:10px;
+              padding:12px 14px; position:relative; overflow:hidden; }
+    .metric::before { content:''; position:absolute; left:0; top:0; bottom:0;
+                      width:3px; background:var(--accent); opacity:.7; }
+    .metric .label { font-size:10px; color:#7a7a7a; text-transform:uppercase;
+                     letter-spacing:.08em; margin-bottom:4px; }
+    .metric .value { font-size:28px; font-weight:800; color:#fff;
+                     line-height:1; font-variant-numeric:tabular-nums; }
+    .metric.alert::before { background:#ff5a5a; }
+    .metric.alert .value { color:#ff7a7a; }
+
+    .alert-banner { margin-top:14px; background:#2a0808;
+                    border-left:4px solid #ff5a5a; color:#ffb3b3;
+                    padding:11px 13px; border-radius:8px; font-weight:600;
+                    font-size:13px; }
+
+    .mtable { margin-top:14px; }
+    .mtable .ttitle { font-size:11px; color:#777; text-transform:uppercase;
+                      letter-spacing:.08em; margin:4px 2px 8px; }
+    .mtable .row { display:flex; justify-content:space-between; align-items:center;
+                   padding:9px 12px; border-radius:8px; margin-bottom:6px;
+                   background:#0e0e0f; border:1px solid #242424; font-size:14px; }
+    .mtable .row .k { color:#bbb; }
+    .mtable .row .val { font-weight:700; color:#fff; font-variant-numeric:tabular-nums; }
+    .mtable .row.hot { border-color:#2e7d46; }
+    .mtable .row.hot .val { color:#7dffa0; }
+
+    pre { font-size:15px; line-height:1.5; color:#9fe; white-space:pre-wrap;
+          word-break:break-word; margin:0; max-height:360px; overflow:auto; }
+    .flex-grow { flex:1; }
+  </style>
+</head>
+<body>
+  <h1>Vision Monitor Demo</h1>
+  <div class="controls">
+    <select id="usecase"></select>
+    <input id="video" placeholder="chemin video" value="data/shop_763.mp4">
+    <button onclick="start()">Analyser</button>
+  </div>
+
+  <div class="layout">
+    <div class="video-col">
+      <img id="stream" src="" alt="flux">
+    </div>
+    <div class="side">
+      <div class="card" id="monitor-card">
+        <h2 id="monitor-title">MONITOR</h2>
+        <div class="metrics" id="metrics"></div>
+        <div id="alert"></div>
+        <div id="table"></div>
+      </div>
+      <div class="card flex-grow">
+        <h2>JSON</h2>
+        <pre id="json">—</pre>
+      </div>
+    </div>
+  </div>
+
+<script>
+let USECASES = {};
+
+async function loadUsecases() {
+  USECASES = await (await fetch('/usecases')).json();
+  const sel = document.getElementById('usecase');
+  for (const [key, info] of Object.entries(USECASES)) {
+    const o = document.createElement('option');
+    o.value = key; o.textContent = info.name;
+    sel.appendChild(o);
+  }
+  syncVideo();
+  sel.addEventListener('change', syncVideo);
+}
+
+function syncVideo() {
+  const key = document.getElementById('usecase').value;
+  const info = USECASES[key];
+  if (info && info.video) {
+    document.getElementById('video').value = info.video;
+  }
+}
+
+async function start() {
+  const usecase = document.getElementById('usecase').value;
+  const video_path = document.getElementById('video').value;
+  const r = await fetch('/analyze', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({usecase, video_path})
+  });
+  if (!r.ok) {
+    const e = await r.json();
+    document.getElementById('json').textContent = 'Erreur : ' + (e.detail || r.status);
+    return;
+  }
+  document.getElementById('stream').src = '/stream?' + Date.now();
+}
+
+function renderMonitor(m) {
+  if (!m) return;
+  document.getElementById('monitor-title').textContent = m.title || 'MONITOR';
+
+  const met = document.getElementById('metrics');
+  met.innerHTML = '';
+  for (const x of (m.metrics || [])) {
+    met.innerHTML +=
+      `<div class="metric ${x.alert ? 'alert' : ''}">
+         <div class="label">${x.label}</div>
+         <div class="value">${x.value}</div>
+       </div>`;
+  }
+
+  const al = document.getElementById('alert');
+  al.innerHTML = m.alert ? `<div class="alert-banner">⚠ ${m.alert}</div>` : '';
+
+  const tb = document.getElementById('table');
+  if (m.table && m.table.rows && m.table.rows.length) {
+    let html = `<div class="mtable">`;
+    if (m.table.title) html += `<div class="ttitle">${m.table.title}</div>`;
+    for (const row of m.table.rows) {
+      html += `<div class="row ${row.hot ? 'hot' : ''}">
+                 <span class="k">${row.id}</span>
+                 <span class="val">${row.value}</span>
+               </div>`;
+    }
+    tb.innerHTML = html + `</div>`;
+  } else {
+    tb.innerHTML = '';
+  }
+}
+
+async function poll() {
+  try {
+    const mon = await (await fetch('/monitor')).json();
+    if (mon.monitor) renderMonitor(mon.monitor);
+    const st = await (await fetch('/stats')).json();
+    document.getElementById('json').textContent = JSON.stringify(st, null, 2);
+  } catch (e) {}
+}
+setInterval(poll, 1000);
+loadUsecases();
+</script>
+</body>
+</html>
