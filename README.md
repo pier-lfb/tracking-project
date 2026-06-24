@@ -1,4 +1,4 @@
-# Portefolio : Pipeline de Détection, Tracking et Analyse Vidéo en Temps Réel :computer:
+# Portfolio : Pipeline de Détection, Tracking et Analyse Vidéo en Temps Réel :computer:
 
 Pipeline de vision temps réel pour l'analyse de flux vidéo :
 **détection**, **suivi multi-objets (MOT)** et **applications métier**
@@ -40,7 +40,7 @@ consulter les métriques calculées pour chaque frame (JSON).
 - Définition d’une zone d'intérêt polygonale au sol
 - Détection et suivi des clients
 - Calcul du temps de présence, persistant pour chaque track/personne
-- Classement top5 des temps de présence par odre décroissant
+- Classement top5 des temps de présence par ordre décroissant
 
 ### :briefcase: Bagages abandonnés
 
@@ -84,7 +84,7 @@ src/
   traffic/      # comptage + vitesses des véhicules
   api/          # FastAPI, démo web, registre de use cases
 tools/          # zone_drawer, calibration homographie
-tests/          # plusieurs tests unitaires par use case (non inclu)
+tests/          # plusieurs tests unitaires par use case
 configs/        # configuration use case (YAML) + zones/homographies (JSON)
 ```
 
@@ -174,7 +174,7 @@ Ouvrir **http://localhost:8000**, sélectionner un cas d’usage puis lancer l�
 
 ```bash
 python tests/test_retail.py
-python tests/test_traffic.py
+python tests/test_trafic.py
 python tests/test_luggage_monitor.py
 ```
 
@@ -233,5 +233,5 @@ python tools/homography_calibrator.py
 
 ### Détecteurs
 
-- **YOLOX** - [article](https://arxiv.org/abs/2107.08430) · [GitHub](https://github.com/Megvii-BaseDetection/YOLOX)
+- **YOLOX** - [Article](https://arxiv.org/abs/2107.08430) · [GitHub](https://github.com/Megvii-BaseDetection/YOLOX)
 - **Ultralytics YOLO** - [GitHub](https://github.com/ultralytics/ultralytics)
