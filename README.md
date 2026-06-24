@@ -14,9 +14,9 @@ mesure de vitesse et comptage de véhicules). Le tout exposé via une **API web*
 
 ## Aperçu
 
-![Démo de l'API multi use-case](docs/demo_overview.gif)
-
-> Sélection du use-case, analyse, dashboard et flux JSON temps réel.
+<p align="left">
+  <img src="assets/api_interface.png" alt="Interface de l'API" width="900">
+</p>
 
 Un même socle **détection + tracking**, trois applications métier, une interface unique :
 
@@ -25,6 +25,8 @@ Un même socle **détection + tracking**, trois applications métier, une interf
 | **Retail** | Comptage de personnes, temps de présence par zone (top 5)                  |
 | **Bagages abandonnés** | Bagage immobile séparé de son propriétaire → alerte                        |
 | **Trafic** | Vitesse des véhicules (homographie), comptage bi-directionnel par portique |
+
+---
 
 ## Architecture
 
@@ -50,13 +52,19 @@ par-dessus - facilite l'évolutivité et la maintenabilité.
                   └────────────────┘
 ```
 
-**Détection** : intégration de détecteurs YOLOX optimisés ONNX/GPU pour l'inférence temps réel.
+**Détection** - modèles YOLO / YOLOX optimisés ONNX pour l’inférence temps réel.  
+**Tracking** - trackers MOT réimplémentés pour comparer robustesse, vitesse et stabilité des identités.    
+**Logique métier** - transformation des trajectoires en indicateurs exploitables : dwell time, comptage, vitesse, alertes.    
+**API** - interface web permettant de lancer une analyse et de visualiser le flux annoté.  
 
-**Tracking** : cinq algorithmes de suivi multi-objets state-of-the-art (ByteTrack, BoT-SORT, OC-SORT…) ré-implémentés à partir des articles et dépôts de référence (cf. [Références](#références)), permettant de choisir le meilleur compromis robustesse/vitesse selon le contexte.
+Principaux endpoints de l'API :
 
-**Logique métier** : transformation des trajectoires brutes en indicateurs exploitables (comptage, temps de présence, vitesse, détection d'événements).
-
-**API** : analyse vidéo, tableau de bord et flux de données, le tout dans le navigateur.
+| Endpoint | Rôle |
+|---|---|
+| `GET /` | Interface web de démonstration |
+| `POST /analyze` | Lancement d’une analyse vidéo |
+| `GET /stream` | Flux vidéo annoté en MJPEG |
+| `GET /monitor` / `GET /stats` | État courant et métriques |
 
 ---
 
@@ -195,27 +203,29 @@ python tools/homography_calibrator.py   # cliquez les sommets puis entrez les co
 
 ### Amélioration des use-cases existants
 - Retail : interactions avec les articles, heatmap de fréquentation, multi-zones
-- Trafic : classification par type de véhicule, détection d'infractions
+- Trafic : classification par type de véhicules, détection d'infractions
 
 ### Nouveaux use-cases
-- Sécurité : détection de chute, port de matériel de sécurité, franchissement de zone interdite
+- Sécurité : détection de chute, port de matériel de sécurité, franchissement de zones interdites
 - Parking : détection de places libres/occupées, temps de stationnement
-- Football : attribution d'équipe, possession de balle, OCR sur les numéros des maillots
+- Football : attribution d'équipes, possession de balle, OCR sur les numéros des maillots
 
 
 ---
 
 ## Références
 
-Trackers réimplémentés :
+### Trackers MOT réimplémentés
 
-- **SORT** - Bewley et al., *Simple Online and Realtime Tracking* (2016) · [arXiv](https://arxiv.org/abs/1602.00763) · [github](https://github.com/abewley/sort)
-- **ByteTrack** - Zhang et al., *ByteTrack: Multi-Object Tracking by Associating Every Detection Box* (2022) · [arXiv](https://arxiv.org/abs/2110.06864) · [github](https://github.com/ifzhang/ByteTrack)
-- **BoT-SORT** - Aharon et al., *BoT-SORT: Robust Associations Multi-Pedestrian Tracking* (2022) · [arXiv](https://arxiv.org/abs/2206.14651) · [github](https://github.com/NirAharon/BoT-SORT)
-- **OC-SORT** - Cao et al., *Observation-Centric SORT* (2023) · [arXiv](https://arxiv.org/abs/2203.14360) · [github](https://github.com/noahcao/OC_SORT)
-- **C-BIoU** - Yang et al., *Hard to Track Objects with Irregular Motions and Similar Appearances? Make It Easier by Buffering the Matching Space* (2023) · [arXiv](https://arxiv.org/abs/2211.14317)
+| Tracker | Papier | Code                                            |
+|----------|---------|-------------------------------------------------|
+| **SORT** | [Bewley et al. (2016)](https://arxiv.org/abs/1602.00763) | [GitHub](https://github.com/abewley/sort)       |
+| **ByteTrack** | [Zhang et al. (2022)](https://arxiv.org/abs/2110.06864) | [GitHub](https://github.com/ifzhang/ByteTrack)  |
+| **BoT-SORT** | [Aharon et al. (2022)](https://arxiv.org/abs/2206.14651) | [GitHub](https://github.com/NirAharon/BoT-SORT) |
+| **OC-SORT** | [Cao et al. (2023)](https://arxiv.org/abs/2203.14360) | [GitHub](https://github.com/noahcao/OC_SORT)    |
+| **C-BIoU** | [Yang et al. (2023)](https://arxiv.org/abs/2211.14317) | -                                               |
 
-Détecteurs :
+### Détecteurs
 
-- **YOLOX** - Ge et al. (2021) · [arXiv](https://arxiv.org/abs/2107.08430) · [github](https://github.com/Megvii-BaseDetection/YOLOX)
-- **Ultralytics YOLO** · [github](https://github.com/ultralytics/ultralytics)
+- **YOLOX** - [article](https://arxiv.org/abs/2107.08430) · [GitHub](https://github.com/Megvii-BaseDetection/YOLOX)
+- **Ultralytics YOLO** - [GitHub](https://github.com/ultralytics/ultralytics)
