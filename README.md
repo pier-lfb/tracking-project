@@ -14,17 +14,18 @@ mesure de vitesse et comptage de véhicules). Le tout exposé via une **API web*
 
 ## Aperçu
 
+Interface web de démonstration permettant de lancer une analyse vidéo, visualiser le flux annoté en temps réel et 
+consulter les métriques calculées pour chaque frame (JSON).
+
 <p align="left">
   <img src="assets/api_interface.png" alt="Interface de l'API" width="900">
 </p>
 
-Un même socle **détection + tracking**, trois applications métier, une interface unique :
-
-| Cas d'usage | Description (en bref)                                                      |
-|-------------|----------------------------------------------------------------------------|
-| **Retail** | Comptage de personnes, temps de présence par zone (top 5)                  |
-| **Bagages abandonnés** | Bagage immobile séparé de son propriétaire → alerte                        |
-| **Trafic** | Vitesse des véhicules (homographie), comptage bi-directionnel par portique |
+| Cas d'usage | Fonctionnalités |
+|-------------|-----------------|
+| **:shopping_cart: Retail** | Temps de présence (*dwell time*) et analyse de fréquentation |
+| **:briefcase: Bagages abandonnés** | Détection de bagages séparés de leur propriétaire |
+| **:vertical_traffic_light: Trafic** | Estimation de vitesse et comptage de véhicules |
 
 ---
 
@@ -112,9 +113,10 @@ conda activate tracking_env
 ```
 
 > **Note**  
-> Les modèles et les données sont disponibles sur ce drive : TODO  
+> Les modèles et les données sont disponibles au lien suivant : 
+[google drive](https://drive.google.com/drive/folders/1rGXeVLXYTYva2PiWnTN28DY-48cRrAqm?usp=sharing) 
 > Placer les modèles dans `models/`, les vidéos dans `data/` et les fichiers 
-de configuration dans `configs/`.
+de configuration dans `configs/`
 
 ---
 
@@ -142,10 +144,10 @@ par-dessus - facilite l'évolutivité et la maintenabilité.
                   └────────────────┘
 ```
 
-**Détection** - modèles YOLO / YOLOX optimisés ONNX pour l’inférence temps réel.  
-**Tracking** - trackers MOT réimplémentés pour comparer robustesse, vitesse et stabilité des identités.    
-**Logique métier** - transformation des trajectoires en indicateurs exploitables : dwell time, comptage, vitesse, alertes.    
-**API** - interface web permettant de lancer une analyse et de visualiser le flux annoté.  
+- **Détection** - modèles YOLO / YOLOX optimisés ONNX pour l’inférence temps réel.  
+- **Tracking** - trackers MOT réimplémentés pour comparer robustesse, vitesse et stabilité des identités.    
+- **Logique métier** - transformation des trajectoires en indicateurs exploitables : dwell time, comptage, vitesse, alertes.    
+- **API** - interface web permettant de lancer une analyse et de visualiser le flux annoté.  
 
 Principaux endpoints de l'API :
 
@@ -160,15 +162,15 @@ Principaux endpoints de l'API :
 
 ## Utilisation
 
-**Démo via l'API** (recommandé) :
+### Lancer l'API (recommandé)
 
 ```bash
 uvicorn src.api.app:app --host 0.0.0.0 --port 8000
 ```
 
-Ouvrir **http://localhost:8000**, choisir un use case, lancer l'analyse.
+Ouvrir **http://localhost:8000**, sélectionner un cas d’usage puis lancer l’analyse.
 
-**Tests unitaires par use case** (fenêtre OpenCV) :
+### Exécuter un use case individuellement
 
 ```bash
 python tests/test_retail.py
@@ -176,20 +178,24 @@ python tests/test_traffic.py
 python tests/test_luggage_monitor.py
 ```
 
-NB: 
-`Espace` = pause, `Q` = quitter  
-debug prompté en console toutes les 100 frames.
+> **Raccourcis**
+>
+> - `Espace` : pause / reprise
+> - `Q` : quitter
+> - Profiling affiché en console toutes les 100 frames
 
-**Définir une zone de surveillance (retail)** :
+### Outils de configuration
+
+**Définition d'une zone d'intérêt (retail)**
 
 ```bash
-python tools/zone_drawer.py   # cliquez les sommets, ENTRÉE pour sauvegarder
+python tools/zone_drawer.py
 ```
 
-**Réaliser une homographie (traffic / luggage)** :
+**Calibration d'une homographie (traffic / luggage)**
 
 ```bash
-python tools/homography_calibrator.py   # cliquez les sommets puis entrez les coordonnées (x, y) de chaque point
+python tools/homography_calibrator.py
 ```
 
 ---
