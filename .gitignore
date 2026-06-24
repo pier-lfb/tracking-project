@@ -222,3 +222,7 @@ __marimo__/
 models/
 data/
 configs/
+
+!models/.gitkeep
+!data/.gitkeep
+!configs/.gitkeep
