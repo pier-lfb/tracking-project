@@ -48,7 +48,7 @@ class Visualizer:
         person_pts = {p["tid"]: p["point"] for p in persons}
         near_ids = set()
 
-        # Porteur (affichage) : seulement pour les sacs MOVING
+        # Association visuelle entre un bagage en mouvement et son porteur probable.
         carriers = {}
         for b in bags:
             st = statuses[b["tid"]]
@@ -58,7 +58,7 @@ class Visualizer:
             else:
                 carriers[b["tid"]] = None
 
-        # 1) Cercles des bagages poses (non MOVING) sur un seul overlay
+        # Zones de proximité autour des bagages posés.
         polygons = []
         for b in bags:
             st = statuses[b["tid"]]
@@ -74,7 +74,7 @@ class Visualizer:
             for poly, color in polygons:
                 cv2.polylines(frame, [poly], True, color, 2, cv2.LINE_AA)
 
-        # 2) Bagages
+        # Bagages.
         for b in bags:
             st = statuses[b["tid"]]
             carrier = carriers[b["tid"]]
@@ -84,7 +84,7 @@ class Visualizer:
             cv2.rectangle(frame, (x1, y1), (x2, y2), color,
                           2 if st.state != BagState.MOVING else 1)
 
-            # Point au sol : sur l'ancre quand la position est epinglée
+            # Point au sol, ou dernière position fiable si le bagage est masqué.
             if st.occluded and st.anchor_world is not None:
                 ax, ay = self.mon.to_image(st.anchor_world.reshape(1, 2))[0]
                 cv2.circle(frame, (int(ax), int(ay)), 4, color, -1, cv2.LINE_AA)
@@ -92,7 +92,7 @@ class Visualizer:
             else:
                 cv2.circle(frame, b["point"], 4, color, -1, cv2.LINE_AA)
 
-            # Label : classe + ID, timer pendant le décompte
+            # Label avec timer pendant la phase "sans surveillance".
             cat = b.get("category", "bagage").upper()
             if st.state == BagState.UNATTENDED:
                 label = f"{cat} ID:{st.track_id}  {st.timer_seconds(self.mon.fps):.1f}s"
@@ -100,7 +100,7 @@ class Visualizer:
                 label = f"{cat} ID:{st.track_id}"
             self._label(frame, label, x1, max(28, y1 - 4), color)
 
-            # Barre de progression vers ABANDONNE
+            # Barre de progression avant alerte.
             if st.state == BagState.UNATTENDED:
                 ratio = min(1.0, st.unattended_frames
                             / self.mon.abandoned_frames_req)
@@ -108,12 +108,12 @@ class Visualizer:
                 cv2.rectangle(frame, (x1, y2 + 4),
                               (x1 + int((x2 - x1) * ratio), y2 + 9), color, -1)
 
-            # SEUL trait : point bas du sac MOVING vers son porteur
+            # Lien vers le porteur probable.
             if carrier is not None and carrier in person_pts:
                 cv2.line(frame, b["point"], person_pts[carrier],
                          C_CARRY, 2, cv2.LINE_AA)
 
-        # 3) Personnes — l'anneau vert marque l'entrée dans une zone
+        # Personnes.
         for p in persons:
             tid = p["tid"]
             near = tid in near_ids
@@ -130,7 +130,7 @@ class Visualizer:
         self._alert_banner(frame, statuses)
         return frame
 
-    # ---------- panneau & bandeau ----------
+    # ---------- monitor ----------
 
     def _panel(self, frame, n_persons, n_bags, statuses, fps):
         n_alert = sum(1 for s in statuses.values()
