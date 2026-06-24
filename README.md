@@ -12,7 +12,7 @@ mesure de vitesse et comptage de véhicules). Le tout exposé via une **API web*
 
 ---
 
-## Aperçu
+## Aperçu :mag:
 
 Interface web de démonstration permettant de lancer une analyse vidéo, visualiser le flux annoté en temps réel et 
 consulter les métriques calculées pour chaque frame (JSON).
@@ -29,7 +29,7 @@ consulter les métriques calculées pour chaque frame (JSON).
 
 ---
 
-## Démo
+## Démo :rocket:
 
 ### :shopping_cart: Retail
 
@@ -90,7 +90,7 @@ configs/        # configuration use case (YAML) + zones/homographies (JSON)
 
 ---
 
-## Installation
+## Installation :floppy_disk:
 
 Créez puis activez l’environnement Conda :
 
@@ -120,7 +120,7 @@ de configuration dans `configs/`
 
 ---
 
-## Architecture
+## Architecture :gear:
 
 Structure modulaire en trois couches : on peut brancher n'importe quel
 détecteur sur n'importe quel tracker, puis n'importe quelle logique métier
@@ -160,7 +160,7 @@ Principaux endpoints de l'API :
 
 ---
 
-## Utilisation
+## Utilisation :wrench:
 
 ### Lancer l'API (recommandé)
 
@@ -200,7 +200,7 @@ python tools/homography_calibrator.py
 
 ---
 
-## Pistes d'évolution
+## Pistes d'évolution :seedling:
 
 ### Général
 - Conteneurisation Docker de l'API
@@ -219,7 +219,7 @@ python tools/homography_calibrator.py
 
 ---
 
-## Références
+## Références :newspaper:
 
 ### Trackers MOT réimplémentés
 
