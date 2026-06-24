@@ -220,9 +220,10 @@ __marimo__/
 
 # Project specific
 models/*
-data/*
-configs/*
-
 !models/.gitkeep
+
+data/*
 !data/.gitkeep
+
+configs/*
 !configs/.gitkeep
