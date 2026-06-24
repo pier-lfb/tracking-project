@@ -1,4 +1,4 @@
-# Portefolio : Pipeline de Détection, Tracking et Analyse Vidéo :computer:
+# Portefolio : Pipeline de Détection, Tracking et Analyse Vidéo en Temps Réel :computer:
 
 Pipeline de vision temps réel pour l'analyse de flux vidéo :
 **détection**, **suivi multi-objets (MOT)** et **applications métier**
