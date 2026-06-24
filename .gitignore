@@ -219,7 +219,6 @@ __marimo__/
 
 
 # Project specific
-tests/
 models/
 data/
 configs/
