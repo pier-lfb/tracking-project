@@ -28,46 +28,6 @@ Un même socle **détection + tracking**, trois applications métier, une interf
 
 ---
 
-## Architecture
-
-Structure modulaire en trois couches : on peut brancher n'importe quel
-détecteur sur n'importe quel tracker, puis n'importe quelle logique métier
-par-dessus - facilite l'évolutivité et la maintenabilité.
-
-```
-                  ┌────────────────┐
-   flux vidéo ──► │    Détection   │    YOLO / YOLOX (ONNX)
-                  └────────┬───────┘
-                           │  détections (bbox + classes)
-                  ┌────────▼───────┐
-                  │    Tracking    │    ByteTrack · BoT-SORT · OC-SORT · SORT · C-BIoU
-                  └────────┬───────┘
-                           │  tracks (identités persistantes)
-                  ┌────────▼────────┐
-                  │ Logique métier  │   retail · luggage · trafic ...
-                  └────────┬────────┘
-                           │  frame annotée + métriques
-                  ┌────────▼───────┐
-                  │       API      │    FastAPI · stream MJPEG · dashboard
-                  └────────────────┘
-```
-
-**Détection** - modèles YOLO / YOLOX optimisés ONNX pour l’inférence temps réel.  
-**Tracking** - trackers MOT réimplémentés pour comparer robustesse, vitesse et stabilité des identités.    
-**Logique métier** - transformation des trajectoires en indicateurs exploitables : dwell time, comptage, vitesse, alertes.    
-**API** - interface web permettant de lancer une analyse et de visualiser le flux annoté.  
-
-Principaux endpoints de l'API :
-
-| Endpoint | Rôle |
-|---|---|
-| `GET /` | Interface web de démonstration |
-| `POST /analyze` | Lancement d’une analyse vidéo |
-| `GET /stream` | Flux vidéo annoté en MJPEG |
-| `GET /monitor` / `GET /stats` | État courant et métriques |
-
----
-
 ## Démo
 
 ### :shopping_cart: Retail
@@ -155,6 +115,46 @@ conda activate tracking_env
 > Les modèles et les données sont disponibles sur ce drive : TODO  
 > Placer les modèles dans `models/`, les vidéos dans `data/` et les fichiers 
 de configuration dans `configs/`.
+
+---
+
+## Architecture
+
+Structure modulaire en trois couches : on peut brancher n'importe quel
+détecteur sur n'importe quel tracker, puis n'importe quelle logique métier
+par-dessus - facilite l'évolutivité et la maintenabilité.
+
+```
+                  ┌────────────────┐
+   flux vidéo ──► │    Détection   │    YOLO / YOLOX (ONNX)
+                  └────────┬───────┘
+                           │  détections (bbox + classes)
+                  ┌────────▼───────┐
+                  │    Tracking    │    ByteTrack · BoT-SORT · OC-SORT · SORT · C-BIoU
+                  └────────┬───────┘
+                           │  tracks (identités persistantes)
+                  ┌────────▼────────┐
+                  │ Logique métier  │   retail · luggage · trafic ...
+                  └────────┬────────┘
+                           │  frame annotée + métriques
+                  ┌────────▼───────┐
+                  │       API      │    FastAPI · stream MJPEG · dashboard
+                  └────────────────┘
+```
+
+**Détection** - modèles YOLO / YOLOX optimisés ONNX pour l’inférence temps réel.  
+**Tracking** - trackers MOT réimplémentés pour comparer robustesse, vitesse et stabilité des identités.    
+**Logique métier** - transformation des trajectoires en indicateurs exploitables : dwell time, comptage, vitesse, alertes.    
+**API** - interface web permettant de lancer une analyse et de visualiser le flux annoté.  
+
+Principaux endpoints de l'API :
+
+| Endpoint | Rôle |
+|---|---|
+| `GET /` | Interface web de démonstration |
+| `POST /analyze` | Lancement d’une analyse vidéo |
+| `GET /stream` | Flux vidéo annoté en MJPEG |
+| `GET /monitor` / `GET /stats` | État courant et métriques |
 
 ---
 
