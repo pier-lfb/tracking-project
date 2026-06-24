@@ -114,7 +114,7 @@ conda activate tracking_env
 
 > **Note**  
 > Les modèles et les données sont disponibles au lien suivant : 
-[google drive](https://drive.google.com/drive/folders/1rGXeVLXYTYva2PiWnTN28DY-48cRrAqm?usp=sharing) 
+[google drive](https://drive.google.com/drive/folders/1rGXeVLXYTYva2PiWnTN28DY-48cRrAqm?usp=sharing)  
 > Placer les modèles dans `models/`, les vidéos dans `data/` et les fichiers 
 de configuration dans `configs/`
 
