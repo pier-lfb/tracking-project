@@ -15,6 +15,7 @@ app = FastAPI(title="Vision Monitor Demo")
 
 DEFAULT_VIDEOS = {
     "retail": "data/shop_763.mp4",
+    "soccer": "data/soccer.mp4",
     "luggage": "data/avss2007_luggage.mp4",
     "traffic": "data/traffic.mp4",
 }

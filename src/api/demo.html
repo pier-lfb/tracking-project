@@ -56,6 +56,16 @@
     pre { font-size:15px; line-height:1.5; color:#9fe; white-space:pre-wrap;
           word-break:break-word; margin:0; max-height:360px; overflow:auto; }
     .flex-grow { flex:1; }
+
+
+    .barblock { margin-top:14px; }
+    .bar-title { font-size:11px; color:#777; text-transform:uppercase;
+                 letter-spacing:.08em; margin:4px 2px 8px; }
+    .posbar { height:14px; display:flex; border:1px solid #3a3a3a;
+              border-radius:999px; overflow:hidden; background:#0e0e0f; }
+    .posbar .left, .posbar .right { height:100%; transition:width .25s ease; }
+    .bar-labels { display:flex; justify-content:space-between; margin-top:8px;
+                  font-size:12px; color:#bbb; font-variant-numeric:tabular-nums; }
   </style>
 </head>
 <body>
@@ -75,6 +85,7 @@
         <h2 id="monitor-title">MONITOR</h2>
         <div class="metrics" id="metrics"></div>
         <div id="alert"></div>
+        <div id="bars"></div>
         <div id="table"></div>
       </div>
       <div class="card flex-grow">
@@ -138,6 +149,30 @@ function renderMonitor(m) {
 
   const al = document.getElementById('alert');
   al.innerHTML = m.alert ? `<div class="alert-banner">⚠ ${m.alert}</div>` : '';
+
+  const bars = document.getElementById('bars');
+  bars.innerHTML = '';
+  for (const b of (m.bars || [])) {
+    const left = b.left || {label:'Left', value:0, color:'#4cc8ff'};
+    const right = b.right || {label:'Right', value:0, color:'#888'};
+    const lv = Number(left.value || 0);
+    const rv = Number(right.value || 0);
+    const total = Math.max(lv + rv, 1);
+    const lp = Math.round(1000 * lv / total) / 10;
+    const rp = Math.round(1000 * rv / total) / 10;
+    bars.innerHTML += `
+      <div class="barblock">
+        <div class="bar-title">${b.label || ''}</div>
+        <div class="posbar">
+          <div class="left" style="width:${lp}%;background:${left.color || '#4cc8ff'}"></div>
+          <div class="right" style="width:${rp}%;background:${right.color || '#888'}"></div>
+        </div>
+        <div class="bar-labels">
+          <span>${left.label} ${lv.toFixed(1)}%</span>
+          <span>${right.label} ${rv.toFixed(1)}%</span>
+        </div>
+      </div>`;
+  }
 
   const tb = document.getElementById('table');
   if (m.table && m.table.rows && m.table.rows.length) {

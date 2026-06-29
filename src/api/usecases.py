@@ -275,8 +275,139 @@ class TrafficUseCase(BaseUseCase):
         return frame, monitor, stats
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# FOOTBALL
+# ----------------------------------------------------------------------------------------------------------------------
+
+class SoccerUseCase(BaseUseCase):
+    display_name = "Football Use Case"
+
+    def __init__(self, video_path):
+        super().__init__(video_path)
+        from src.soccer.possession import PossessionTracker
+        from src.soccer.team_assigner import TeamAssigner
+        from src.soccer.team_tracker import TeamTracker
+        from src.soccer.visualizer import FootballVisualizer
+        from src.tracking.botsort import BotSortTracker
+
+        cfg_path = ROOT / "configs" / "soccer.yaml"
+        self.detector, self.class_names = load_detector_config(cfg_path, ROOT)
+        with open(cfg_path, "r", encoding="utf-8") as f:
+            cfg = yaml.safe_load(f)
+
+        team_cfg = cfg["team"]
+        self.tracker = BotSortTracker(**cfg["tracker"])
+        self.team_assigner = TeamAssigner(
+            min_samples=team_cfg.get("min_samples", 150),
+            max_samples=team_cfg.get("max_samples", 400),
+            num_teams=team_cfg.get("num_teams", 2),
+            min_margin=team_cfg.get("min_margin", 12.0),
+        )
+        self.team_tracker = TeamTracker(
+            min_votes=team_cfg.get("min_votes", 5),
+            stale_frames=team_cfg.get("stale_frames", 300),
+            num_teams=team_cfg.get("num_teams", 2),
+            vote_window=team_cfg.get("vote_window", 30),
+        )
+        self.possession = PossessionTracker(**cfg["possession"])
+        self.viz = FootballVisualizer(self.class_names)
+        self.viz._panel = _NOOP
+
+        self.PLAYER = {"Player"}
+        self.GOALKEEPER = {"Goalkeeper"}
+        self.BALL = {"Ball"}
+
+    def _cat(self, track):
+        cid = int(track.category)
+        return self.class_names[cid] if 0 <= cid < len(self.class_names) else "?"
+
+    def process(self, frame, frame_id):
+        t0 = time.perf_counter()
+        frame = cv2.resize(frame, (1280, 720))
+
+        detections = self.detector.detect(frame)
+        ball_detections = [d for d in detections if d.class_name in self.BALL]
+        tracks = self.tracker.update(detections, curr_img=frame)
+
+        player_tracks = [t for t in tracks if self._cat(t) in self.PLAYER]
+        gk_tracks = [t for t in tracks if self._cat(t) in self.GOALKEEPER]
+
+        if not self.team_assigner.is_fitted:
+            self.team_assigner.collect(frame, [t.tlbr for t in player_tracks])
+        else:
+            self.team_tracker.update_players(player_tracks, frame, self.team_assigner, frame_id)
+            self.team_tracker.update_goalkeepers(gk_tracks, player_tracks, frame_id)
+
+        holder_id, holder_team = self.possession.update(
+            player_tracks + gk_tracks,
+            ball_detections,
+            self.team_tracker,
+            frame_id,
+        )
+        possession_stats = self.possession.get_possession_stats()
+
+        if frame_id % 60 == 0:
+            self.team_tracker.prune(frame_id)
+
+        fps = self._smooth_fps(time.perf_counter() - t0)
+        self.viz.draw(
+            frame=frame,
+            tracks=tracks,
+            ball_detections=ball_detections,
+            team_tracker=self.team_tracker,
+            holder_id=holder_id,
+            holder_team=holder_team,
+            stats=possession_stats,
+            fps=fps,
+        )
+
+        assigned = sum(
+            1
+            for t in player_tracks + gk_tracks
+            if self.team_tracker.get_team(t.track_id) != -1
+        )
+        t0_pos = round(possession_stats.get(0, 0.0), 1)
+        t1_pos = round(possession_stats.get(1, 0.0), 1)
+
+        holder = "--" if holder_team == -1 else f"T{holder_team} / ID {holder_id}"
+        monitor = {
+            "title": "FOOTBALL MONITOR",
+            "metrics": [
+                {"label": "Joueurs", "value": len(player_tracks)},
+                {"label": "Gardiens", "value": len(gk_tracks)},
+                {"label": "Assignés", "value": assigned},
+                {"label": "FPS", "value": round(fps, 1)},
+            ],
+            "bars": [
+                {
+                    "label": "Possession",
+                    "left": {"label": "Team 0", "value": t0_pos, "color": "#ff4d4d"},
+                    "right": {"label": "Team 1", "value": t1_pos, "color": "#4d8dff"},
+                }
+            ],
+            "table": {
+                "title": "Ballon",
+                "rows": [
+                    {"id": "Porteur", "value": holder, "hot": holder_team != -1},
+                    {"id": "Ball detections", "value": len(ball_detections)},
+                ],
+            },
+        }
+        stats = {
+            "players": len(player_tracks),
+            "goalkeepers": len(gk_tracks),
+            "assigned": assigned,
+            "holder_id": holder_id,
+            "holder_team": holder_team,
+            "possession": possession_stats,
+            "fps": round(fps, 1),
+        }
+        return frame, monitor, stats
+
+
 REGISTRY = {
     "retail": RetailUseCase,
+    "soccer": SoccerUseCase,
     "luggage": LuggageUseCase,
     "traffic": TrafficUseCase,
 }
