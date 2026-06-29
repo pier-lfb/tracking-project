@@ -34,9 +34,7 @@ consulter les données calculées pour chaque frame (JSON).
 
 ### :shopping_cart: Retail
 
-<p align="left">
-  <img src="assets/retail_demo.gif" alt="Démo du module retail analytics" width="960">
-</p>
+https://github.com/user-attachments/assets/94fab675-d323-4404-b86c-1a3eda836155
 
 - Définition d’une zone d'intérêt polygonale au sol
 - Détection et suivi des clients
@@ -45,9 +43,7 @@ consulter les données calculées pour chaque frame (JSON).
 
 ### :briefcase: Bagages abandonnés
 
-<p align="left">
-  <img src="assets/luggage_demo.gif" alt="Démo du module de détection de bagages abandonnés" width="900">
-</p>
+https://github.com/user-attachments/assets/b248748a-10cf-4396-acb8-d9566b45af48
 
 - Suivi des personnes et des bagages
 - Logique d’état : porté, immobile, séparé, abandonné
@@ -56,9 +52,7 @@ consulter les données calculées pour chaque frame (JSON).
 
 ### :vertical_traffic_light: Trafic
 
-<p align="left">
-  <img src="assets/trafic_demo.gif" alt="Démo du module trafic" width="900">
-</p>
+https://github.com/user-attachments/assets/006f28a6-3f23-4b96-8b6f-4a902c09575c
 
 - Détection et suivi de véhicules
 - Estimation de la vitesse par projection homographique image → route
@@ -67,7 +61,7 @@ consulter les données calculées pour chaque frame (JSON).
 
 ### :soccer: Soccer
 
-https://github.com/user-attachments/assets/c11642df-3507-4ce2-8da4-b0d0b8c78c22
+https://github.com/user-attachments/assets/b8f3865d-1d64-41f1-b7dd-2ec4c01f7c72
 
 - Détection des joueurs, arbitres, gardien et de la balle
 - Tracking avec compensation du mouvement caméra (BoT-SORT -> GMC) 
