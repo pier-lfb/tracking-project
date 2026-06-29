@@ -71,11 +71,11 @@ consulter les données calculées pour chaque frame (JSON).
   <img src="assets/soccer_demo.gif" alt="Démo du module soccer" width="960">
 </p>
 
-- Détection des joueurs, arbitres, gardien et du ballon
+- Détection des joueurs, arbitres, gardien et de la balle
 - Tracking avec compensation du mouvement caméra (BoT-SORT -> GMC) 
 - Association d'une équipe par clustering sur la couleur du maillot (k-means)
 - Calcul du temps de possession pour chaque équipe
-- 
+
 ### Vous aimez les heatmaps ? Moi aussi :sunglasses:
 
 <p align="left">
