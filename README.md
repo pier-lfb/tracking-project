@@ -67,9 +67,14 @@ consulter les données calculées pour chaque frame (JSON).
 
 ### :soccer: Soccer
 
-<p align="left">
-  <img src="assets/soccer_demo.gif" alt="Démo du module soccer" width="960">
-</p>
+<video src="https://github.com/pier-lfb/tracking-project/raw/main/assets/soccer_demo.mp4"
+       controls
+       autoplay
+       muted
+       loop
+       playsinline
+       width="100%">
+</video>
 
 - Détection des joueurs, arbitres, gardien et de la balle
 - Tracking avec compensation du mouvement caméra (BoT-SORT -> GMC) 
