@@ -67,14 +67,7 @@ consulter les données calculées pour chaque frame (JSON).
 
 ### :soccer: Soccer
 
-<video src="https://github.com/pier-lfb/tracking-project/raw/main/assets/soccer_demo.mp4"
-       controls
-       autoplay
-       muted
-       loop
-       playsinline
-       width="100%">
-</video>
+https://github.com/user-attachments/assets/c11642df-3507-4ce2-8da4-b0d0b8c78c22
 
 - Détection des joueurs, arbitres, gardien et de la balle
 - Tracking avec compensation du mouvement caméra (BoT-SORT -> GMC) 
