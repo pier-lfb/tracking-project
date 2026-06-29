@@ -34,9 +34,9 @@ consulter les données calculées pour chaque frame (JSON).
 
 ### :shopping_cart: Retail
 
-<video width="900" autoplay loop muted playsinline>
-    <source src="assets/soccer_demo.mp4" type="video/mp4">
-</video>
+<p align="left">
+  <img src="assets/retail_demo.gif" alt="Démo du module retail analytics" width="960">
+</p>
 
 - Définition d’une zone d'intérêt polygonale au sol
 - Détection et suivi des clients
