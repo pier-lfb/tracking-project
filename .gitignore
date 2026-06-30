@@ -227,3 +227,6 @@ data/*
 
 configs/*
 !configs/.gitkeep
+
+results/*
+!results/.gitkeep
