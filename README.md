@@ -214,15 +214,15 @@ python tools/homography_calibrator.py
 
 ## :chart_with_upwards_trend: Évaluation
 
-Les trackers sont évalués sur le split de validation de **MOT17**, à l'aide des détections des trois détecteurs fournis : **DPM**, **FRCNN** et **SDP**.
+Les trackers sont évalués sur le jeu de validation de **MOT17**, à l'aide des détections des trois détecteurs fournies : **DPM**, **FRCNN** et **SDP**.
 
-Pour lancer le benchmark complet :
+Pour lancer une évaluation complète :
 
 ```bash
 eval\benchmark_mot17.bat
 ```
 
-Pour lancer un benchmark ciblé (e.g. **ByteTrack** et **FRCNN**) :
+Pour lancer une évaluation ciblée (e.g. **ByteTrack** et **FRCNN**) :
 
 ```bash
 eval\benchmark_mot17.bat --trackers bytetrack --detectors FRCNN
@@ -230,9 +230,9 @@ eval\benchmark_mot17.bat --trackers bytetrack --detectors FRCNN
 
 Les métriques reportées sont :
 
-- **MOTA** : précision globale du tracking
-- **HOTA** : équilibre entre détection et association
-- **IDF1** : qualité de conservation des identités
+- **HOTA** : métrique principale, combine précision des détections et cohérence des associations d’identités.
+- **IDF1** : évalue la capacité du tracker à conserver la bonne identité pour un même objet au cours du temps.
+- **MOTA** : combine faux positifs, objets manqués et changements d’identité en un seul score.
 
 ### Résultats avec DPM
 
@@ -266,9 +266,9 @@ En conséquence, la bonne démarche est parfois d'optimiser le détecteur avant 
 Les trackers modernes comme **ByteTrack**, **BoT-SORT** et **OC-SORT** surpassent **SORT**, utilisé ici comme baseline.
 
 > **Notes**
-> - **BoT-SORT** est évalué ici sans GMC, car cette option nécessite de recharger le dataset complet.
-> - Les résultats ne sont pas toujours directement comparables à ceux des articles originaux. Par exemple, **ByteTrack** est évalué avec des détections issues de **YOLOX**.
-> - Pour plus d’informations sur l’impact de la qualité des détections : https://trackers.roboflow.com/latest/learn/detection-quality/
+> - **BoT-SORT** est évalué ici sans GMC, car cette option nécessite de recharger le dataset complet (en non seulement les détections).
+> - Les résultats sont cohérents avec ceux obtenus sur Roboflow, mais ne sont pas toujours directement comparables à ceux des articles originaux. Par exemple, **ByteTrack** est évalué avec des détections issues de **YOLOX**.
+> - Pour plus d’informations sur l'évaluation et l’impact de la qualité des détections : https://trackers.roboflow.com/latest/learn/detection-quality/
 
 ---
 
@@ -311,4 +311,4 @@ Les trackers modernes comme **ByteTrack**, **BoT-SORT** et **OC-SORT** surpassen
 
 ### Évaluation
 
-- Trackers (RobotFlow) - [Website](https://trackers.roboflow.com/latest/)
+- Trackers (Roboflow) - [Website](https://trackers.roboflow.com/latest/)
