@@ -268,7 +268,9 @@ Les trackers modernes comme **ByteTrack**, **BoT-SORT** et **OC-SORT** surpassen
 > **Notes**
 > - **BoT-SORT** est évalué ici sans GMC, car cette option nécessite de recharger le dataset complet (en non seulement les détections).
 > - Les résultats sont cohérents avec ceux obtenus par Roboflow avec leurs propres implémentations, mais ne sont pas toujours directement comparables à ceux des articles originaux. Par exemple, **ByteTrack** est évalué avec des détections issues de **YOLOX**.
-> - Pour plus d’informations sur l'évaluation et l’impact de la qualité des détections : https://trackers.roboflow.com/latest/learn/detection-quality/
+> - Pour plus d’informations sur l'évaluation et l’impact de la qualité des détections :  
+https://trackers.roboflow.com/latest/learn/evaluate/  
+https://trackers.roboflow.com/latest/learn/detection-quality/
 
 ---
 
