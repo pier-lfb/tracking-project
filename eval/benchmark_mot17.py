@@ -3,6 +3,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from eval.utils_mot17 import DETECTORS, TRACKERS, normalize_tracker_name
+
 
 def run_command(cmd, verbose=False):
     if verbose:
@@ -27,15 +29,15 @@ def parse_args():
     parser.add_argument(
         "--trackers",
         nargs="+",
-        default=["sort", "bytetrack", "ocsort", "botsort"],
-        choices=["sort", "bytetrack", "botsort", "ocsort", "bot-sort", "oc-sort"],
+        default=["sort", "bytetrack", "ocsort", "botsort", "cbiou"],
+        choices=TRACKERS,
     )
 
     parser.add_argument(
         "--detectors",
         nargs="+",
-        default=["DPM", "FRCNN", "SDP"],
-        choices=["DPM", "FRCNN", "SDP"],
+        default=DETECTORS,
+        choices=DETECTORS,
     )
 
     parser.add_argument("--conf-thresh", type=float, default=0.1)
@@ -55,7 +57,10 @@ def parse_args():
 
     parser.add_argument("--verbose", action="store_true")
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    args.trackers = [normalize_tracker_name(tracker) for tracker in args.trackers]
+
+    return args
 
 
 def run_tracking(args, tracker, detector, tracker_output_dir):

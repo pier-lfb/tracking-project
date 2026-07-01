@@ -270,8 +270,8 @@ Les métriques reportées sont :
       <td align="right">0.516</td>
     </tr>
     <tr>
-      <td><strong>OC-SORT</strong></td>
-      <td align="right"><strong>0.305</strong></td>
+      <td>OC-SORT</td>
+      <td align="right">0.305</td>
       <td align="right">0.298</td>
       <td align="right"><strong>0.397</strong></td>
       <td align="right">0.495</td>
@@ -283,27 +283,39 @@ Les métriques reportées sont :
     </tr>
     <tr>
       <td>BoT-SORT</td>
-      <td align="right">0.299</td>
-      <td align="right"><strong>0.299</strong></td>
-      <td align="right">0.381</td>
-      <td align="right"><strong>0.499</strong></td>
-      <td align="right">0.494</td>
-      <td align="right">0.568</td>
-      <td align="right">0.606</td>
-      <td align="right"><strong>0.526</strong></td>
-      <td align="right">0.637</td>
+      <td align="right">0.287</td>
+      <td align="right">0.281</td>
+      <td align="right">0.356</td>
+      <td align="right">0.474</td>
+      <td align="right">0.467</td>
+      <td align="right">0.533</td>
+      <td align="right">0.571</td>
+      <td align="right">0.495</td>
+      <td align="right">0.585</td>
     </tr>
     <tr>
       <td>ByteTrack</td>
       <td align="right">0.299</td>
-      <td align="right">0.299</td>
+      <td align="right"><strong>0.299</strong></td>
       <td align="right">0.381</td>
-      <td align="right">0.499</td>
+      <td align="right"><strong>0.499</strong></td>
       <td align="right">0.479</td>
       <td align="right">0.567</td>
       <td align="right"><strong>0.607</strong></td>
-      <td align="right">0.525</td>
+      <td align="right"><strong>0.525</strong></td>
       <td align="right"><strong>0.638</strong></td>
+    </tr>
+    <tr>
+      <td>C-BIoU</td>
+      <td align="right"><strong>0.309</strong></td>
+      <td align="right">0.289</td>
+      <td align="right">0.374</td>
+      <td align="right"><strong>0.499</strong></td>
+      <td align="right">0.486</td>
+      <td align="right">0.555</td>
+      <td align="right">0.600</td>
+      <td align="right">0.502</td>
+      <td align="right">0.611</td>
     </tr>
   </tbody>
 </table>
@@ -313,7 +325,7 @@ En conséquence, la bonne démarche est parfois d'optimiser le détecteur avant 
 Les trackers modernes comme ByteTrack, BoT-SORT et OC-SORT surpassent SORT, utilisé ici comme baseline.
 
 > **Notes**
-> - BoT-SORT est évalué ici sans GMC, car cette option nécessite de recharger le dataset complet (en non seulement les détections).
+> - BoT-SORT est évalué ici dans sa version simplifiée, sans GMC ni ReID (qui n'a pas encore été ajoutée au projet).
 > - Les résultats sont cohérents avec ceux obtenus par Roboflow avec leurs propres implémentations, mais ne sont pas toujours directement comparables à ceux des articles originaux. Par exemple, **ByteTrack** est évalué avec des détections issues de **YOLOX**.
 > - Pour plus d’informations sur l'évaluation et l’impact de la qualité des détections : https://trackers.roboflow.com/latest/learn/detection-quality/
 
@@ -330,6 +342,7 @@ Les trackers modernes comme ByteTrack, BoT-SORT et OC-SORT surpassent SORT, util
 - Retail : interactions avec les articles, heatmap de fréquentation, multi-zones
 - Trafic : classification par type de véhicules, détection d'infractions
 - Soccer : tracker spécifique pour la balle, tracking by query (e.g. TrackFormer), méthode de clustering plus robuste (basée sur extraction des features de ReID)
+- Ajout de features de ReID (en particulier BoT-SORT)
 
 ### Nouveaux use-cases
 - Sécurité : détection de chute, port de matériel de sécurité, franchissement de zones interdites

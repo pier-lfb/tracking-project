@@ -9,17 +9,29 @@ from src.tracking.sort import SortTracker
 from src.tracking.bytetrack import ByteTracker
 from src.tracking.botsort import BotSortTracker
 from src.tracking.ocsort import OcSortTracker
+from src.tracking.c_biou import CBIoUTracker
 
 
 DETECTORS = ["DPM", "FRCNN", "SDP"]
+TRACKERS = ["sort", "bytetrack", "botsort", "ocsort", "cbiou"]
 
 
 def normalize_tracker_name(name):
-    return name.lower().replace("-", "").replace("_", "")
+    tracker = str(name).lower()
+
+    if tracker not in TRACKERS:
+        raise ValueError(
+            "Tracker inconnu: {}. Choix possibles: {}".format(
+                name,
+                ", ".join(TRACKERS),
+            )
+        )
+
+    return tracker
 
 
 def normalize_detector_name(name):
-    detector = name.upper()
+    detector = str(name).upper()
 
     if detector not in DETECTORS:
         raise ValueError(
@@ -198,6 +210,18 @@ def make_tracker(
             track_buffer=track_buffer,
             frame_rate=frame_rate,
             delta_t=delta_t,
+        )
+
+    if name == "cbiou":
+        return CBIoUTracker(
+            conf_thresh=conf_thresh,
+            track_buffer=track_buffer,
+            motion="byte",
+            frame_rate=frame_rate,
+            match_thresh1=0.7,
+            match_thresh2=0.6,
+            b1=0.3,
+            b2=0.5,
         )
 
     raise ValueError("Tracker inconnu: {}".format(tracker_name))

@@ -5,6 +5,8 @@ import cv2
 from tqdm import tqdm
 
 from eval.utils_mot17 import (
+    DETECTORS,
+    TRACKERS,
     iter_mot17_sequences,
     make_tracker,
     normalize_tracker_name,
@@ -97,7 +99,7 @@ def run_sequence(sequence, output_path, args):
         min_hits=args.min_hits,
         delta_t=args.delta_t,
         fuse_score=not args.no_fuse_score,
-        gmc=not args.no_gmc,
+        gmc=use_gmc,
     )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -126,12 +128,12 @@ def parse_args():
     parser.add_argument(
         "--tracker",
         required=True,
-        choices=["sort", "bytetrack", "botsort", "ocsort", "bot-sort", "oc-sort"],
+        choices=TRACKERS,
     )
     parser.add_argument(
         "--detector",
         required=True,
-        choices=["DPM", "FRCNN", "SDP"],
+        choices=DETECTORS,
     )
     parser.add_argument("--output-dir", type=Path, required=True)
 
@@ -152,6 +154,7 @@ def parse_args():
 def main():
     args = parse_args()
 
+    tracker_name = normalize_tracker_name(args.tracker)
     sequences = list(iter_mot17_sequences(args.mot_root, args.detector))
 
     if not sequences:
@@ -164,7 +167,7 @@ def main():
 
     print(
         "[MOT17] Extraction | tracker={} | detector={} | sequences={}".format(
-            args.tracker,
+            tracker_name,
             args.detector,
             len(sequences),
         )

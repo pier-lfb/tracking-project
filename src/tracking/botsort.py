@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-from src.tracking.bytetrack import ByteTracker
-from src.tracking.basetrack import TrackState
+
+from src.tracking.basetrack import BaseTrack, TrackState
 from src.tracking.tracklet import Tracklet
 from src.tracking.matching import iou_distance, linear_assignment, fuse_det_score
 from src.tracking.utils import (
@@ -13,8 +13,16 @@ from src.tracking.utils import (
 
 
 def _gmc_opencv(curr_img, prev_img):
-    curr_gray = cv2.cvtColor(cv2.resize(curr_img, (curr_img.shape[1] // 2, curr_img.shape[0] // 2)), cv2.COLOR_BGR2GRAY)
-    prev_gray = cv2.cvtColor(cv2.resize(prev_img, (prev_img.shape[1] // 2, prev_img.shape[0] // 2)), cv2.COLOR_BGR2GRAY)
+    """Global Motion Compensation via ORB + estimateAffinePartial2D.
+    Retourne la matrice de warp 2x3 (identite si echec)."""
+    curr_gray = cv2.cvtColor(
+        cv2.resize(curr_img, (curr_img.shape[1] // 2, curr_img.shape[0] // 2)),
+        cv2.COLOR_BGR2GRAY,
+    )
+    prev_gray = cv2.cvtColor(
+        cv2.resize(prev_img, (prev_img.shape[1] // 2, prev_img.shape[0] // 2)),
+        cv2.COLOR_BGR2GRAY,
+    )
     orb = cv2.ORB_create(500)
     kp1, desc1 = orb.detectAndCompute(prev_gray, None)
     kp2, desc2 = orb.detectAndCompute(curr_gray, None)
@@ -30,7 +38,8 @@ def _gmc_opencv(curr_img, prev_img):
 
 
 def _multi_gmc(stracks, H):
-    """Compensation du mouvement camera : transforme l'etat ET la covariance."""
+    """Compensation du mouvement camera : transforme l'etat ET la covariance
+    de chaque tracklet (state xywh + velocities, dim 8)."""
     if len(stracks) == 0:
         return
     R = H[:2, :2].astype(float)
@@ -49,14 +58,24 @@ def _multi_gmc(stracks, H):
         kf.P = R8x8.dot(kf.P).dot(R8x8.T)
 
 
-class BotSortTracker(ByteTracker):
-    def __init__(self, conf_thresh=0.5, track_buffer=30, motion='bot', frame_rate=30,
-                 with_gmc=True, match_thresh=0.8, fuse_score=True):
-        super().__init__(conf_thresh=conf_thresh, track_buffer=track_buffer,
-                         motion=motion, frame_rate=frame_rate,
-                         match_thresh=match_thresh, fuse_score=fuse_score)
+class BotSortTracker:
+    """BoT-SORT sans branche ReID : IoU + GMC uniquement."""
+    def __init__(self, conf_thresh=0.5, track_buffer=30, motion='bot', frame_rate=30, with_gmc=True, match_thresh=0.8,
+                 fuse_score=True, proximity_thresh=0.5):
+        self.conf_thresh = conf_thresh
+        self.det_thresh = conf_thresh + 0.1
+        self.match_thresh = match_thresh
+        self.fuse_score = fuse_score
+        self.motion = motion
         self.with_gmc = with_gmc
+        self.proximity_thresh = proximity_thresh
+        self.frame_id = 0
+        self.max_time_lost = int(frame_rate / 30.0 * track_buffer)
+        self.tracked_tracklets = []
+        self.lost_tracklets = []
+        self.removed_tracklets = []
         self.prev_img = None
+        BaseTrack.reset_id()
 
     def update(self, detections, curr_img=None):
         output_results = detections_to_array(detections)
@@ -88,13 +107,16 @@ class BotSortTracker(ByteTracker):
         scores_second = scores[inds_second]
         cates_second = categories[inds_second]
 
-        detections = [Tracklet(d, s, c, motion=self.motion) for d, s, c in zip(dets, scores_keep, cates)] if len(dets) > 0 else []
-        detections_second = [Tracklet(d, s, c, motion=self.motion) for d, s, c in zip(dets_second, scores_second, cates_second)] if len(dets_second) > 0 else []
+        detections = [Tracklet(d, s, c, motion=self.motion)
+                      for d, s, c in zip(dets, scores_keep, cates)] if len(dets) > 0 else []
+        detections_second = [Tracklet(d, s, c, motion=self.motion)
+                              for d, s, c in zip(dets_second, scores_second, cates_second)] if len(dets_second) > 0 else []
 
         unconfirmed = [t for t in self.tracked_tracklets if not t.is_activated]
         tracked_tracklets = [t for t in self.tracked_tracklets if t.is_activated]
-        tracklet_pool = joint_tracklets(tracked_tracklets, self.lost_tracklets)
 
+        # Predict avant GMC
+        tracklet_pool = joint_tracklets(tracked_tracklets, self.lost_tracklets)
         for t in tracklet_pool:
             t.predict()
 
@@ -103,58 +125,70 @@ class BotSortTracker(ByteTracker):
             _multi_gmc(tracklet_pool, warp)
             _multi_gmc(unconfirmed, warp)
 
-        # --- Association 1 ---
-        dists = iou_distance(tracklet_pool, detections)
+        # Association 1 : high-score dets vs (tracked + lost)
+        ious_dists = iou_distance(tracklet_pool, detections)
+        # proximity_thresh : toute paire trop loin en IoU est exclue avant meme le fuse
+        ious_dists_mask = ious_dists > self.proximity_thresh
         if self.fuse_score:
-            dists = fuse_det_score(dists, detections)
-        matches, u_track, u_detection = linear_assignment(dists, thresh=self.match_thresh)
+            ious_dists = fuse_det_score(ious_dists, detections)
+        ious_dists[ious_dists_mask] = 1.0
+
+        matches, u_track, u_detection = linear_assignment(ious_dists, thresh=self.match_thresh)
         for itracked, idet in matches:
             track, det = tracklet_pool[itracked], detections[idet]
             if track.state == TrackState.Tracked:
                 track.update(det, self.frame_id)
                 activated_tracklets.append(track)
             else:
-                track.re_activate(det, self.frame_id)
+                track.re_activate(det, self.frame_id, new_id=False)
                 refind_tracklets.append(track)
 
-        # --- Association 2 (BYTE) ---
-        r_tracked = [tracklet_pool[i] for i in u_track if tracklet_pool[i].state == TrackState.Tracked]
-        dists = iou_distance(r_tracked, detections_second)
-        matches, u_track2, _ = linear_assignment(dists, thresh=0.5)
+        # Association 2 (BYTE)
+        r_tracked_tracklets = [tracklet_pool[i] for i in u_track
+                                if tracklet_pool[i].state == TrackState.Tracked]
+        dists = iou_distance(r_tracked_tracklets, detections_second)
+        matches, u_track, u_detection_second = linear_assignment(dists, thresh=0.5)
         for itracked, idet in matches:
-            track, det = r_tracked[itracked], detections_second[idet]
+            track, det = r_tracked_tracklets[itracked], detections_second[idet]
             if track.state == TrackState.Tracked:
                 track.update(det, self.frame_id)
                 activated_tracklets.append(track)
             else:
-                track.re_activate(det, self.frame_id)
+                track.re_activate(det, self.frame_id, new_id=False)
                 refind_tracklets.append(track)
-        for it in u_track2:
-            track = r_tracked[it]
+
+        for it in u_track:
+            track = r_tracked_tracklets[it]
             if track.state != TrackState.Lost:
                 track.mark_lost()
                 lost_tracklets.append(track)
 
-        # --- Association 3 : unconfirmed ---
-        detections_remaining = [detections[i] for i in u_detection]
-        dists = iou_distance(unconfirmed, detections_remaining)
+        # Unconfirmed
+        detections = [detections[i] for i in u_detection]
+        ious_dists = iou_distance(unconfirmed, detections)
+        ious_dists_mask = ious_dists > self.proximity_thresh
         if self.fuse_score:
-            dists = fuse_det_score(dists, detections_remaining)
-        matches, u_unconfirmed, u_det = linear_assignment(dists, thresh=0.7)
+            ious_dists = fuse_det_score(ious_dists, detections)
+        ious_dists[ious_dists_mask] = 1.0
+
+        matches, u_unconfirmed, u_detection = linear_assignment(ious_dists, thresh=0.7)
         for itracked, idet in matches:
-            unconfirmed[itracked].update(detections_remaining[idet], self.frame_id)
+            unconfirmed[itracked].update(detections[idet], self.frame_id)
             activated_tracklets.append(unconfirmed[itracked])
         for it in u_unconfirmed:
-            unconfirmed[it].mark_removed()
-            removed_tracklets.append(unconfirmed[it])
+            track = unconfirmed[it]
+            track.mark_removed()
+            removed_tracklets.append(track)
 
-        for inew in u_det:
-            track = detections_remaining[inew]
+        # Nouveaux tracks
+        for inew in u_detection:
+            track = detections[inew]
             if track.score < self.det_thresh:
                 continue
             track.activate(self.frame_id)
             activated_tracklets.append(track)
 
+        # Gestion des lost trop anciens
         for track in self.lost_tracklets:
             if self.frame_id - track.end_frame > self.max_time_lost:
                 track.mark_removed()
