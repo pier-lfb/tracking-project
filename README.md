@@ -80,8 +80,13 @@ https://github.com/user-attachments/assets/b8f3865d-1d64-41f1-b7dd-2ec4c01f7c72
 
 ```
 assets/         # images/gifs pour le README
+configs/        # configuration use case (YAML) + zones/homographies (JSON)
+data/           # données (vidéos et détection MOT17)
+eval/           # scripts d'évaluation
+models/         # poids des modèles (ONNX)
+results/        # fichiers tracking au format MOT
 src/
-  detection/    # détecteurs ONNX + post-processing
+  detection/    # détecteurs + post-processing
   tracking/     # trackers MOT réimplémentés (ByteTrack, BoT-SORT, OC-SORT, SORT, C-BIoU)
   retail/       # comptage clients + temps de présence par zone
   luggage/      # détection de bagages abandonnés
@@ -207,6 +212,69 @@ python tools/homography_calibrator.py
 
 ---
 
+## Évaluation
+
+Les trackers sont évalués sur le split de validation de **MOT17**, avec les trois détecteurs fournis : **DPM**, **FRCNN** et **SDP**.
+
+### Lancer le benchmark complet
+
+```bash
+eval\benchmark_mot17.bat
+```
+
+### Lancer un benchmark ciblé
+
+Exemple avec **ByteTrack** et **FRCNN** :
+
+```bash
+eval\benchmark_mot17.bat --trackers bytetrack --detectors FRCNN
+```
+
+Les métriques reportées sont :
+
+- **MOTA** : précision globale du tracking
+- **HOTA** : équilibre entre détection et association
+- **IDF1** : qualité de conservation des identités
+
+### Résultats avec DPM
+
+| Tracker | MOTA | HOTA | IDF1 |
+|---|---:|---:|---:|
+| **SORT** | 0.287 | 0.264 | 0.344 |
+| **OC-SORT** | **0.305** | 0.298 | **0.397** |
+| **BoT-SORT** | 0.299 | **0.299** | 0.381 |
+| **ByteTrack** | 0.299 | 0.299 | 0.381 |
+
+### Résultats avec FRCNN
+
+| Tracker | MOTA | HOTA | IDF1 |
+|---|---:|---:|---:|
+| **SORT** | 0.481 | 0.465 | 0.530 |
+| **OC-SORT** | 0.495 | **0.498** | **0.573** |
+| **BoT-SORT** | **0.499** | 0.494 | 0.568 |
+| **ByteTrack** | 0.499 | 0.479 | 0.567 |
+
+### Résultats avec SDP
+
+| Tracker | MOTA | HOTA | IDF1 |
+|---|---:|---:|---:|
+| **SORT** | 0.550 | 0.437 | 0.516 |
+| **OC-SORT** | 0.600 | 0.510 | 0.626 |
+| **ByteTrack** | **0.607** | 0.525 | **0.638** |
+| **BoT-SORT** | 0.606 | **0.526** | 0.637 |
+
+Les résultats montrent que la qualité des détections influence fortement les performances de tracking.  
+**SDP** produit les meilleurs résultats, tandis que **DPM** obtient les performances les plus faibles. 
+Les trackers modernes comme **ByteTrack**, **BoT-SORT** et **OC-SORT** surpassent globalement **SORT**, utilisé ici comme baseline simple.
+
+> **Notes**
+>
+> - **BoT-SORT** est évalué ici sans GMC, car cette option nécessite de charger les frames des séquences.
+> - Les résultats ne sont pas directement comparables à ceux des articles originaux. Par exemple, **ByteTrack** est évalué avec des détections issues de **YOLOX**.
+> - Pour plus d’informations sur l’impact de la qualité des détections : https://trackers.roboflow.com/latest/learn/detection-quality/
+
+---
+
 ## :seedling: Pistes d'évolution
 
 ### Général
@@ -243,3 +311,7 @@ python tools/homography_calibrator.py
 
 - **YOLOX** - [Article](https://arxiv.org/abs/2107.08430) · [GitHub](https://github.com/Megvii-BaseDetection/YOLOX)
 - **Ultralytics YOLO** - [GitHub](https://github.com/ultralytics/ultralytics)
+
+### Évaluation
+
+- Trackers (RobotFlow) - [Website](https://trackers.roboflow.com/latest/)
