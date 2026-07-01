@@ -214,7 +214,7 @@ python tools/homography_calibrator.py
 
 ## :chart_with_upwards_trend: Évaluation
 
-Les trackers sont évalués à l'aide de l'outil Trackers de Roboflow sur le jeu de validation de **MOT17**, à l'aide des détections des trois détecteurs fournies : **DPM**, **FRCNN** et **SDP**.
+Les trackers sont évalués avec l’outil Trackers de Roboflow sur le jeu de validation MOT17, en utilisant les détections fournies pour les trois détecteurs : DPM, FRCNN et SDP.
 
 Pour lancer une évaluation complète :
 
@@ -222,7 +222,7 @@ Pour lancer une évaluation complète :
 eval\benchmark_mot17.bat
 ```
 
-Pour lancer une évaluation ciblée (e.g. **ByteTrack** et **FRCNN**) :
+Pour lancer une évaluation ciblée (e.g. ByteTrack et FRCNN) :
 
 ```bash
 eval\benchmark_mot17.bat --trackers bytetrack --detectors FRCNN
@@ -230,47 +230,92 @@ eval\benchmark_mot17.bat --trackers bytetrack --detectors FRCNN
 
 Les métriques reportées sont :
 
-- **HOTA** : métrique principale, combine précision des détections et cohérence des associations d’identités.
-- **IDF1** : évalue la capacité du tracker à conserver la bonne identité pour un même objet au cours du temps.
-- **MOTA** : combine faux positifs, objets manqués et changements d’identité.
+- HOTA : métrique principale, combine précision des détections et cohérence des associations d’identités.
+- IDF1 : évalue la capacité du tracker à conserver la bonne identité pour un même objet au cours du temps.
+- MOTA : combine faux positifs, objets manqués et changements d’identité.
 
-### Résultats avec DPM
+### Résultats MOT17 par détecteur
 
-| Tracker | MOTA | HOTA | IDF1 |
-|---|---:|---:|---:|
-| **SORT** | 0.287 | 0.264 | 0.344 |
-| **OC-SORT** | **0.305** | 0.298 | **0.397** |
-| **BoT-SORT** | 0.299 | **0.299** | 0.381 |
-| **ByteTrack** | 0.299 | 0.299 | 0.381 |
-
-### Résultats avec FRCNN
-
-| Tracker | MOTA | HOTA | IDF1 |
-|---|---:|---:|---:|
-| **SORT** | 0.481 | 0.465 | 0.530 |
-| **OC-SORT** | 0.495 | **0.498** | **0.573** |
-| **BoT-SORT** | **0.499** | 0.494 | 0.568 |
-| **ByteTrack** | 0.499 | 0.479 | 0.567 |
-
-### Résultats avec SDP
-
-| Tracker | MOTA | HOTA | IDF1 |
-|---|---:|---:|---:|
-| **SORT** | 0.550 | 0.437 | 0.516 |
-| **OC-SORT** | 0.600 | 0.510 | 0.626 |
-| **ByteTrack** | **0.607** | 0.525 | **0.638** |
-| **BoT-SORT** | 0.606 | **0.526** | 0.637 |
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2" align="left">Tracker</th>
+      <th colspan="3" align="center">DPM</th>
+      <th colspan="3" align="center">FRCNN</th>
+      <th colspan="3" align="center">SDP</th>
+    </tr>
+    <tr>
+      <th align="right">MOTA</th>
+      <th align="right">HOTA</th>
+      <th align="right">IDF1</th>
+      <th align="right">MOTA</th>
+      <th align="right">HOTA</th>
+      <th align="right">IDF1</th>
+      <th align="right">MOTA</th>
+      <th align="right">HOTA</th>
+      <th align="right">IDF1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SORT</td>
+      <td align="right">0.287</td>
+      <td align="right">0.264</td>
+      <td align="right">0.344</td>
+      <td align="right">0.481</td>
+      <td align="right">0.465</td>
+      <td align="right">0.530</td>
+      <td align="right">0.550</td>
+      <td align="right">0.437</td>
+      <td align="right">0.516</td>
+    </tr>
+    <tr>
+      <td><strong>OC-SORT</strong></td>
+      <td align="right"><strong>0.305</strong></td>
+      <td align="right">0.298</td>
+      <td align="right"><strong>0.397</strong></td>
+      <td align="right">0.495</td>
+      <td align="right"><strong>0.498</strong></td>
+      <td align="right"><strong>0.573</strong></td>
+      <td align="right">0.600</td>
+      <td align="right">0.510</td>
+      <td align="right">0.626</td>
+    </tr>
+    <tr>
+      <td>BoT-SORT</td>
+      <td align="right">0.299</td>
+      <td align="right"><strong>0.299</strong></td>
+      <td align="right">0.381</td>
+      <td align="right"><strong>0.499</strong></td>
+      <td align="right">0.494</td>
+      <td align="right">0.568</td>
+      <td align="right">0.606</td>
+      <td align="right"><strong>0.526</strong></td>
+      <td align="right">0.637</td>
+    </tr>
+    <tr>
+      <td>ByteTrack</td>
+      <td align="right">0.299</td>
+      <td align="right">0.299</td>
+      <td align="right">0.381</td>
+      <td align="right">0.499</td>
+      <td align="right">0.479</td>
+      <td align="right">0.567</td>
+      <td align="right"><strong>0.607</strong></td>
+      <td align="right">0.525</td>
+      <td align="right"><strong>0.638</strong></td>
+    </tr>
+  </tbody>
+</table>
 
 Les résultats montrent que la qualité des détections influence fortement les performances de tracking.
 En conséquence, la bonne démarche est parfois d'optimiser le détecteur avant le tracker en lui-même.
-Les trackers modernes comme **ByteTrack**, **BoT-SORT** et **OC-SORT** surpassent **SORT**, utilisé ici comme baseline.
+Les trackers modernes comme ByteTrack, BoT-SORT et OC-SORT surpassent SORT, utilisé ici comme baseline.
 
 > **Notes**
-> - **BoT-SORT** est évalué ici sans GMC, car cette option nécessite de recharger le dataset complet (en non seulement les détections).
+> - BoT-SORT est évalué ici sans GMC, car cette option nécessite de recharger le dataset complet (en non seulement les détections).
 > - Les résultats sont cohérents avec ceux obtenus par Roboflow avec leurs propres implémentations, mais ne sont pas toujours directement comparables à ceux des articles originaux. Par exemple, **ByteTrack** est évalué avec des détections issues de **YOLOX**.
-> - Pour plus d’informations sur l'évaluation et l’impact de la qualité des détections :  
-https://trackers.roboflow.com/latest/learn/evaluate/  
-https://trackers.roboflow.com/latest/learn/detection-quality/
+> - Pour plus d’informations sur l'évaluation et l’impact de la qualité des détections : https://trackers.roboflow.com/latest/learn/detection-quality/
 
 ---
 
@@ -289,8 +334,6 @@ https://trackers.roboflow.com/latest/learn/detection-quality/
 ### Nouveaux use-cases
 - Sécurité : détection de chute, port de matériel de sécurité, franchissement de zones interdites
 - Parking : détection de places libres/occupées, temps de stationnement
-- Football : attribution d'équipes, possession de balle, OCR sur les numéros des maillots
-
 
 ---
 
