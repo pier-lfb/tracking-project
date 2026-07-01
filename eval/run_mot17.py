@@ -4,7 +4,7 @@ from pathlib import Path
 import cv2
 from tqdm import tqdm
 
-from eval.mot17_common import (
+from eval.utils_mot17 import (
     iter_mot17_sequences,
     make_tracker,
     normalize_tracker_name,

@@ -1,16 +1,14 @@
 from __future__ import annotations
-
 from pathlib import Path
-
 from trackers import Dataset, DatasetAsset, DatasetSplit, download_dataset
 
 
-def main() -> None:
+def main():
     download_dataset(
         dataset=Dataset.MOT17,
         split=DatasetSplit.VAL,
         asset=[DatasetAsset.ANNOTATIONS, DatasetAsset.DETECTIONS],
-        output=str(Path("data")),
+        output=str(Path("data"))
     )
 
 

@@ -219,13 +219,13 @@ Les trackers sont évalués avec l’outil Trackers de Roboflow sur le jeu de va
 Pour lancer une évaluation complète :
 
 ```bash
-eval\benchmark_mot17.bat
+python -m eval.benchmark_mot17 --mot-root data/mot17/val
 ```
 
 Pour lancer une évaluation ciblée (e.g. ByteTrack et FRCNN) :
 
 ```bash
-eval\benchmark_mot17.bat --trackers bytetrack --detectors FRCNN
+python -m eval.benchmark_mot17 --mot-root data/mot17/val --trackers bytetrack --detectors FRCNN
 ```
 
 Les métriques reportées sont :
@@ -234,12 +234,12 @@ Les métriques reportées sont :
 - IDF1 : évalue la capacité du tracker à conserver la bonne identité pour un même objet au cours du temps.
 - MOTA : combine faux positifs, objets manqués et changements d’identité.
 
-### Résultats MOT17 par détecteur
+### Comparaison des trackers sur MOT17
 
 <table>
   <thead>
     <tr>
-      <th rowspan="2" align="left">Trackers ↓<br>Détecteurs →</th>
+      <th rowspan="2" align="left">Trackers </th>
       <th colspan="3" align="center">DPM</th>
       <th colspan="3" align="center">FRCNN</th>
       <th colspan="3" align="center">SDP</th>

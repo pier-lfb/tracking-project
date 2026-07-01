@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 from statistics import mean
 
-from eval.mot17_common import iter_mot17_sequences
+from eval.utils_mot17 import iter_mot17_sequences
 
 
 def run_command(cmd, verbose=False):
