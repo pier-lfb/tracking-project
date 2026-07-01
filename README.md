@@ -261,8 +261,7 @@ Les métriques reportées sont :
 | **ByteTrack** | **0.607** | 0.525 | **0.638** |
 | **BoT-SORT** | 0.606 | **0.526** | 0.637 |
 
-Les résultats montrent que la qualité des détections influence fortement les performances de tracking.  
-**SDP** produit les meilleurs résultats, tandis que **DPM** obtient les performances les plus faibles. 
+Les résultats montrent que la qualité des détections influence fortement les performances de tracking.
 Les trackers modernes comme **ByteTrack**, **BoT-SORT** et **OC-SORT** surpassent globalement **SORT**, utilisé ici comme baseline simple.
 
 > **Notes**
