@@ -238,6 +238,8 @@ Les métriques reportées sont :
 
 ### Résultats MOT17 par détecteur
 
+### Résultats MOT17 par détecteur
+
 <table>
   <thead>
     <tr>
@@ -263,7 +265,6 @@ Les métriques reportées sont :
     <tr>
       <td colspan="10"><hr></td>
     </tr>
-
     <tr>
       <td><strong>SORT</strong></td>
       <td align="right">0.287</td>
@@ -276,7 +277,6 @@ Les métriques reportées sont :
       <td align="right">0.437</td>
       <td align="right">0.516</td>
     </tr>
-
     <tr>
       <td><strong>OC-SORT</strong></td>
       <td align="right"><strong>0.305</strong></td>
@@ -289,7 +289,6 @@ Les métriques reportées sont :
       <td align="right">0.510</td>
       <td align="right">0.626</td>
     </tr>
-
     <tr>
       <td><strong>BoT-SORT</strong></td>
       <td align="right">0.299</td>
@@ -302,7 +301,6 @@ Les métriques reportées sont :
       <td align="right"><strong>0.526</strong></td>
       <td align="right">0.637</td>
     </tr>
-
     <tr>
       <td><strong>ByteTrack</strong></td>
       <td align="right">0.299</td>
