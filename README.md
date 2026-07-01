@@ -214,7 +214,7 @@ python tools/homography_calibrator.py
 
 ## :chart_with_upwards_trend: Évaluation
 
-Les trackers sont évalués sur le jeu de validation de **MOT17**, à l'aide des détections des trois détecteurs fournies : **DPM**, **FRCNN** et **SDP**.
+Les trackers sont évalués à l'aide de l'outil Trackers de Roboflow sur le jeu de validation de **MOT17**, à l'aide des détections des trois détecteurs fournies : **DPM**, **FRCNN** et **SDP**.
 
 Pour lancer une évaluation complète :
 
@@ -232,7 +232,7 @@ Les métriques reportées sont :
 
 - **HOTA** : métrique principale, combine précision des détections et cohérence des associations d’identités.
 - **IDF1** : évalue la capacité du tracker à conserver la bonne identité pour un même objet au cours du temps.
-- **MOTA** : combine faux positifs, objets manqués et changements d’identité en un seul score.
+- **MOTA** : combine faux positifs, objets manqués et changements d’identité.
 
 ### Résultats avec DPM
 
@@ -267,7 +267,7 @@ Les trackers modernes comme **ByteTrack**, **BoT-SORT** et **OC-SORT** surpassen
 
 > **Notes**
 > - **BoT-SORT** est évalué ici sans GMC, car cette option nécessite de recharger le dataset complet (en non seulement les détections).
-> - Les résultats sont cohérents avec ceux obtenus sur Roboflow, mais ne sont pas toujours directement comparables à ceux des articles originaux. Par exemple, **ByteTrack** est évalué avec des détections issues de **YOLOX**.
+> - Les résultats sont cohérents avec ceux obtenus par Roboflow avec leurs propres implémentations, mais ne sont pas toujours directement comparables à ceux des articles originaux. Par exemple, **ByteTrack** est évalué avec des détections issues de **YOLOX**.
 > - Pour plus d’informations sur l'évaluation et l’impact de la qualité des détections : https://trackers.roboflow.com/latest/learn/detection-quality/
 
 ---
