@@ -214,7 +214,7 @@ python tools/homography_calibrator.py
 
 ## :chart_with_upwards_trend: Évaluation
 
-Les trackers sont évalués sur le split de validation de **MOT17**, avec les trois détecteurs fournis : **DPM**, **FRCNN** et **SDP**.
+Les trackers sont évalués sur le split de validation de **MOT17**, à l'aide des détections des trois détecteurs fournis : **DPM**, **FRCNN** et **SDP**.
 
 Pour lancer le benchmark complet :
 
@@ -262,11 +262,12 @@ Les métriques reportées sont :
 | **BoT-SORT** | 0.606 | **0.526** | 0.637 |
 
 Les résultats montrent que la qualité des détections influence fortement les performances de tracking.
-Les trackers modernes comme **ByteTrack**, **BoT-SORT** et **OC-SORT** surpassent globalement **SORT**, utilisé ici comme baseline simple.
+En conséquence, la bonne démarche est parfois d'optimiser le détecteur avant le tracker en lui-même.
+Les trackers modernes comme **ByteTrack**, **BoT-SORT** et **OC-SORT** surpassent **SORT**, utilisé ici comme baseline.
 
 > **Notes**
-> - **BoT-SORT** est évalué ici sans GMC, car cette option nécessite de charger le dataset complet.
-> - Les résultats ne sont pas directement comparables à ceux des articles originaux. Par exemple, **ByteTrack** est évalué avec des détections issues de **YOLOX**.
+> - **BoT-SORT** est évalué ici sans GMC, car cette option nécessite de recharger le dataset complet.
+> - Les résultats ne sont pas toujours directement comparables à ceux des articles originaux. Par exemple, **ByteTrack** est évalué avec des détections issues de **YOLOX**.
 > - Pour plus d’informations sur l’impact de la qualité des détections : https://trackers.roboflow.com/latest/learn/detection-quality/
 
 ---
