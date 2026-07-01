@@ -236,17 +236,13 @@ Les métriques reportées sont :
 
 ### Résultats MOT17 par détecteur
 
-### Résultats MOT17 par détecteur
-
-### Résultats MOT17 par détecteur
-
 <table>
   <thead>
     <tr>
-      <th rowspan="2" align="left">Tracker</th>
-      <th colspan="3" align="center">Détecteur : DPM</th>
-      <th colspan="3" align="center">Détecteur : FRCNN</th>
-      <th colspan="3" align="center">Détecteur : SDP</th>
+      <th rowspan="2" align="left">Trackers ↓<br>Détecteurs →</th>
+      <th colspan="3" align="center">DPM</th>
+      <th colspan="3" align="center">FRCNN</th>
+      <th colspan="3" align="center">SDP</th>
     </tr>
     <tr>
       <th align="right">MOTA</th>
@@ -260,13 +256,9 @@ Les métriques reportées sont :
       <th align="right">IDF1</th>
     </tr>
   </thead>
-
   <tbody>
     <tr>
-      <td colspan="10"><hr></td>
-    </tr>
-    <tr>
-      <td><strong>SORT</strong></td>
+      <td>SORT</td>
       <td align="right">0.287</td>
       <td align="right">0.264</td>
       <td align="right">0.344</td>
@@ -290,7 +282,7 @@ Les métriques reportées sont :
       <td align="right">0.626</td>
     </tr>
     <tr>
-      <td><strong>BoT-SORT</strong></td>
+      <td>BoT-SORT</td>
       <td align="right">0.299</td>
       <td align="right"><strong>0.299</strong></td>
       <td align="right">0.381</td>
@@ -302,7 +294,7 @@ Les métriques reportées sont :
       <td align="right">0.637</td>
     </tr>
     <tr>
-      <td><strong>ByteTrack</strong></td>
+      <td>ByteTrack</td>
       <td align="right">0.299</td>
       <td align="right">0.299</td>
       <td align="right">0.381</td>
